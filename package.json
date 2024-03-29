@@ -1,0 +1,36 @@
+{
+    "name": "@casekit/typed-sql",
+    "version": "0.0.1",
+    "description": "Generate typed functions for your SQL files",
+    "main": "lib/index",
+    "types": "lib/index",
+    "scripts": {
+        "test": "vitest"
+    },
+    "keywords": [],
+    "author": "Russell Dunphy (@rsslldnphy)",
+    "license": "ISC",
+    "dependencies": {
+        "fs": "0.0.1-security",
+        "glob": "^10.3.10",
+        "lodash": "^4.17.21",
+        "pg": "^8.11.3",
+        "pg-format": "^1.0.4"
+    },
+    "devDependencies": {
+        "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+        "@types/lodash": "^4.17.0",
+        "@types/node": "^20.11.30",
+        "@types/pg": "^8.11.4",
+        "@types/pg-format": "^1.0.5",
+        "@typescript-eslint/eslint-plugin": "^7.3.1",
+        "dotenv": "^16.4.5",
+        "eslint-import-resolver-typescript": "^3.6.1",
+        "eslint-plugin-import": "^2.29.1",
+        "prettier": "^3.2.5",
+        "tsx": "^4.7.1",
+        "typescript": "^5.4.3",
+        "vite-tsconfig-paths": "^4.3.2",
+        "vitest": "^1.4.0"
+    }
+}
