@@ -20,8 +20,14 @@ dependencies:
   pg-format:
     specifier: ^1.0.4
     version: 1.0.4
+  prettier:
+    specifier: ^3.2.5
+    version: 3.2.5
 
 devDependencies:
+  '@casekit/unindent':
+    specifier: ^1.0.3
+    version: 1.0.3
   '@trivago/prettier-plugin-sort-imports':
     specifier: ^4.3.0
     version: 4.3.0(prettier@3.2.5)
@@ -49,9 +55,6 @@ devDependencies:
   eslint-plugin-import:
     specifier: ^2.29.1
     version: 2.29.1(@typescript-eslint/parser@7.4.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
-  prettier:
-    specifier: ^3.2.5
-    version: 3.2.5
   tsx:
     specifier: ^4.7.1
     version: 4.7.1
@@ -196,6 +199,10 @@ packages:
       '@babel/helper-string-parser': 7.24.1
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
+    dev: true
+
+  /@casekit/unindent@1.0.3:
+    resolution: {integrity: sha512-5Z5NSo2u9QU7CZt9Lk4gMcx0uA73oYfAbKfoi9GkQaThe1MAD4hxZ1mimqb0a2GaNXm1t2arji2jeHqVqtnz+g==}
     dev: true
 
   /@esbuild/aix-ppc64@0.19.12:
@@ -2833,7 +2840,6 @@ packages:
     resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
     hasBin: true
-    dev: true
 
   /pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}

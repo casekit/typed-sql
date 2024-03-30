@@ -1,45 +1,71 @@
 import fs from "fs";
 import { globSync as glob } from "glob";
 import { camelCase, last, upperFirst } from "lodash";
+import { Client } from "pg";
+import prettier from "prettier";
 
-const directory = process.argv[2];
-const files = glob(directory + "/**/*.sql");
-console.log(files);
+import { extractParameterTypes } from "./extractParameterTypes";
+import { neutralizeQuery } from "./neutralizeQuery";
+import { replacePlaceholders } from "./replacePlaceholders";
 
-for (const file of files) {
-    console.log("Query file", file);
-    const query = fs.readFileSync(file, { encoding: "utf-8" });
-    const comments = query.split("\n").filter((l) => l.startsWith("--- "));
-
-    let i = 0;
-    const paramIndexes: Record<string, number> = {};
-    const normalized = query.replace(/(?<!:):(\w+)\b/gi, (_, x) => {
-        if (paramIndexes[x]) {
-            return "$" + [x];
-        }
-        return "$" + (paramIndexes[x] = ++i);
+export const format = async (source: string) => {
+    return await prettier.format(source, {
+        parser: "typescript",
+        printWidth: 80,
+        tabWidth: 4,
+        trailingComma: "all",
+        singleQuote: false,
+        semi: true,
     });
+};
 
-    const paramTypes = Object.fromEntries(
-        comments.map((c) => {
-            const match = c.match(/^--- (\S+):\s+(\S+)/);
-            if (match && match.length >= 3) {
-                return [match[1], match[2]];
-            } else {
-                throw new Error("Unparseable type comment: " + c);
-            }
-        }),
-    );
+(async () => {
+    const directory = process.argv[2];
+    const files = glob(directory + "/**/*.sql");
+    console.log(files);
+    for (const file of files) {
+        console.log("Query file", file);
+        const query = fs.readFileSync(file, { encoding: "utf-8" });
+        const name = camelCase(last(file.split("/"))!.split(".")[0]);
+        const outfile = file.replace(/\.sql$/, ".query.ts");
 
-    const name = camelCase(last(file.split("/"))!.split(".")[0]);
+        const parameterTypes = extractParameterTypes(query);
+        const { normalized, substitutions, variables } = replacePlaceholders(
+            query,
+            {},
+        );
 
-    const output = `
-        export type ${upperFirst(name)}Parameters = { ${Object.keys(
-            paramIndexes,
-        )
-            .map((p) => `${p}: ${paramTypes[p] ?? "unknown"}`)
+        const neutralized = neutralizeQuery(normalized);
+        const client = new Client({
+            database: "typed-sql",
+            user: "typed-sql",
+            password: "password",
+        });
+        try {
+            await client.connect();
+            const result = await client.query(neutralized, variables);
+            // get data type ids from result.fields (will need to query postgres by the id)
+            // convert this to a typescript type
+            // include the generated result type in the output file below
+        } catch (e) {
+            console.log(e);
+        } finally {
+            client.end();
+        }
+
+        const output = `
+        export type ${upperFirst(name)}Parameters = { ${substitutions
+            .map((p) => `${p}: ${parameterTypes[p] ?? "unknown"}`)
             .join(", ")} };
+
+        export type ${upperFirst(name)}ResultRow = { };
+
+        export ${name} = (parameters: ${upperFirst(name)}Parameters): ${upperFirst(name)}ResultRow => {
+            // ..........
+        }
     `;
 
-    console.log(output);
-}
+        fs.writeFileSync(outfile, await format(output), { encoding: "utf-8" });
+        console.log("Written query function to", outfile);
+    }
+})();

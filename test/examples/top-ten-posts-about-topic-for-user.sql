@@ -9,13 +9,14 @@ SELECT
 FROM
 	"post" p
 	JOIN "user" u ON p.author_id = u.id
-	LEFT JOIN "likes" l ON p.id = l.post_id
+	LEFT JOIN "like" l ON p.id = l.post_id
 WHERE
 	p.title ILIKE :query
 	AND u.name = :username
+	AND p.topic in (:...topics)
 GROUP BY
-	p.id
+	p.id, u.id, u.name
+HAVING count(1) > :minimum
 ORDER BY
 	count(1) DESC
-HAVING count(1) > :minimum
 LIMIT 10
